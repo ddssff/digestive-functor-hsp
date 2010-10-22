@@ -1,0 +1,17 @@
+Name:                digestive-functors-hsp
+Version:             0.1
+Synopsis:            HSP support for digestive-functors
+-- Description:         
+Homepage:            http://src.seereason.com/digestive-functors-hsp
+License:             BSD3
+License-file:        LICENSE
+Author:              Jeremy Shaw
+Maintainer:          jeremy@n-heptane.com
+Category:            Web
+Build-type:          Simple
+Cabal-version:       >=1.2
+
+
+Library
+  Exposed-modules:     Text.Digestive.HSP.Html4
+  Build-depends:       base, digestive-functors, hsp, hsx
