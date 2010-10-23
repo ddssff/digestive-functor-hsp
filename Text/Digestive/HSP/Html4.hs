@@ -4,7 +4,7 @@ module Text.Digestive.HSP.Html4 where
 
 import Data.Maybe                      (fromMaybe)
 import Data.Monoid                     (Monoid(mempty))
-import HSP                             (XMLGenerator, XMLGenT, EmbedAsChild(..), EmbedAsAttr(..), Attr(..), genElement, genEElement)
+import HSP                             (XMLGenerator, XMLGenT, EmbedAsChild(..), EmbedAsAttr(..), Attr(..), genElement, genEElement, set)
 import qualified HSX.XMLGenerator      as HSX
 import Text.Digestive.Types
 import Text.Digestive.Validator
@@ -112,3 +112,9 @@ testForm form =
              do print e
                 mapM_ (putStrLn . renderAsHTML . runIdentity . unXMLGenT ) $ unView view' e
 -}
+
+setAttrs :: (EmbedAsAttr x attr, XMLGenerator x, Monad m, Functor m) =>
+            Form m i e [HSX.GenXML x] a 
+         -> attr 
+         -> Form m i e [HSX.GenXML x] a
+setAttrs form attrs = mapView (map (`set` attrs)) form
