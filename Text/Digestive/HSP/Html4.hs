@@ -11,7 +11,7 @@ import Text.Digestive.Validator
 import qualified Text.Digestive.Common as Common
 
 showFormId :: FormId -> String
-showFormId (FormId i) = show i
+showFormId (FormId p i) = p ++ show i
 
 inputText :: (Monad m, Functor m, XMLGenerator x)
           => Maybe String
@@ -73,9 +73,16 @@ inputRadio br def choices =
         , <label for=id'><% fromMaybe mempty $ lookup val choices %></label>
         ] ++ if br then [<br />] else []
 
+submit :: (Monad m, Functor m, XMLGenerator x)
+          => String
+          -> Form m String e [XMLGenT x (HSX.XML x)] String
+submit v = 
+    Common.inputString (\id' inp ->
+        [<input type="text" name=(showFormId id') id=(showFormId id') value=(fromMaybe "" inp) />]) (Just v)
+
 label :: (Monad m, XMLGenerator x, EmbedAsChild x c)
       => c
-      -> Form m i e [XMLGenT x (HSX.XML x)] a
+      -> Form m i e [XMLGenT x (HSX.XML x)] ()
 label string =
     Common.label $ \id' ->
         [<label for=(showFormId id')><% string %></label>]
@@ -89,11 +96,11 @@ errorList children =
     ]
 
 errors :: (Monad m, XMLGenerator x) => 
-          Form m i String [XMLGenT x (HSX.XML x)] a
+          Form m i String [XMLGenT x (HSX.XML x)] ()
 errors = Common.errors errorList
 
 childErrors :: (Monad m, XMLGenerator x) => 
-               Form m i String [XMLGenT x (HSX.XML x)] a
+               Form m i String [XMLGenT x (HSX.XML x)] ()
 childErrors = Common.childErrors errorList
 
 {-
