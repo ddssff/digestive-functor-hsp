@@ -78,7 +78,7 @@ submit :: (Monad m, Functor m, XMLGenerator x)
           -> Form m String e [XMLGenT x (HSX.XML x)] String
 submit v = 
     Common.inputString (\id' inp ->
-        [<input type="text" name=(showFormId id') id=(showFormId id') value=(fromMaybe "" inp) />]) (Just v)
+        [<input type="submit" name=(showFormId id') id=(showFormId id') value=(fromMaybe "" inp) />]) (Just v)
 
 label :: (Monad m, XMLGenerator x, EmbedAsChild x c)
       => c
