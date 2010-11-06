@@ -2,23 +2,36 @@
 {-# OPTIONS_GHC -F -pgmFtrhsx #-}
 module Text.Digestive.HSP.Html4 where
 
+import Control.Applicative             ((<$>))
 import Data.Maybe                      (fromMaybe)
 import Data.Monoid                     (Monoid(mempty))
+import Data.Text                       (Text)
+import qualified Data.Text             as Text
 import HSP                             (XMLGenerator, XMLGenT, EmbedAsChild(..), EmbedAsAttr(..), Attr(..), genElement, genEElement, set)
 import qualified HSX.XMLGenerator      as HSX
-import Text.Digestive.Types
-import Text.Digestive.Validator
+import Text.Digestive
 import qualified Text.Digestive.Common as Common
 
 showFormId :: FormId -> String
 showFormId (FormId p i) = p ++ show i
 
-inputText :: (Monad m, Functor m, XMLGenerator x)
+inputString :: (Monad m, Functor m, XMLGenerator x)
           => Maybe String
           -> Form m String e [XMLGenT x (HSX.XML x)] String
-inputText = 
+inputString = 
     Common.inputString $ \id' inp ->
         [<input type="text" name=(showFormId id') id=(showFormId id') value=(fromMaybe "" inp) />]
+
+
+-- FIMXE: we really need a inputText primitive on Common. or maybe inputByteString?
+inputText :: (Monad m, Functor m, XMLGenerator x)
+          => Maybe Text
+          -> Form m String e [XMLGenT x (HSX.XML x)] Text
+inputText v = 
+    Text.pack <$>
+        ((Common.inputString $ \id' inp ->
+            [<input type="text" name=(showFormId id') id=(showFormId id') value=(fromMaybe "" inp) />]) (Text.unpack <$> v))
+
 
 inputTextArea :: (Monad m, Functor m, XMLGenerator x) =>
                  Maybe Int
