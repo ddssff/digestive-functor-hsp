@@ -1,0 +1,51 @@
+Source: haskell-digestive-functors-hsp
+Priority: optional
+Section: misc
+Maintainer: Clifford Beshers <beshers@seereason.com>
+Build-Depends: debhelper (>= 7.0),
+               haskell-devscripts (>= 0.6.15+nmu7),
+               hscolour,
+               cdbs,
+               ghc6 (>= 6.8),
+               ghc6-prof,
+               libghc6-digestive-functors-prof,
+               libghc6-hsp-prof,
+               libghc6-hsx-prof,
+               libghc6-text-prof
+Build-Depends-Indep: ghc6-doc,
+                     haddock,
+                     libghc6-digestive-functors-doc,
+                     libghc6-hsp-doc,
+                     libghc6-hsx-doc,
+                     libghc6-text-doc
+Standards-Version: 3.8.1
+Homepage: http://src.seereason.com/digestive-functors-hsp
+
+Package: libghc6-digestive-functors-hsp-dev
+Architecture: any
+Section: haskell
+Depends: ${haskell:Depends},
+         ${misc:Depends}
+Description: HSP support for digestive-functors
+ .
+ This package contains the normal library files.
+
+Package: libghc6-digestive-functors-hsp-prof
+Architecture: any
+Section: haskell
+Depends: ${haskell:Depends},
+         ${misc:Depends},
+         libghc6-digestive-functors-hsp-dev
+Description: HSP support for digestive-functors
+ .
+ This package contains the libraries compiled with profiling enabled.
+
+Package: libghc6-digestive-functors-hsp-doc
+Architecture: all
+Section: doc
+Depends: ${haskell:Depends},
+         ${misc:Depends},
+         ghc6-doc
+Description: HSP support for digestive-functors
+ .
+ This package contains the documentation files.
