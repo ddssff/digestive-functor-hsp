@@ -15,3 +15,6 @@ Cabal-version:       >=1.2
 Library
   Exposed-modules:     Text.Digestive.HSP.Html4
   Build-depends:       base, digestive-functors, hsp, hsx, text
+  if !os(windows)
+    -- Cabal has a bug on windows and cannot find trhsx
+    Build-Tools: trhsx
