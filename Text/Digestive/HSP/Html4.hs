@@ -100,7 +100,7 @@ label string =
     Common.label $ \id' ->
         [<label for=(showFormId id')><% string %></label>]
 
-errorList :: (XMLGenerator x, EmbedAsChild x c) => [c] -> [XMLGenT x (HSX.XML x)]
+errorList :: (XMLGenerator x, EmbedAsChild x c, EmbedAsChild x [HSX.XML x]) => [c] -> [XMLGenT x (HSX.XML x)]
 errorList [] = []
 errorList children =
     [<ul>
@@ -108,11 +108,11 @@ errorList children =
      </ul>
     ]
 
-errors :: (Monad m, XMLGenerator x) => 
+errors :: (Monad m, XMLGenerator x, EmbedAsChild x [HSX.XML x]) => 
           Form m i String [XMLGenT x (HSX.XML x)] ()
 errors = Common.errors errorList
 
-childErrors :: (Monad m, XMLGenerator x) => 
+childErrors :: (Monad m, XMLGenerator x, EmbedAsChild x [HSX.XML x]) => 
                Form m i String [XMLGenT x (HSX.XML x)] ()
 childErrors = Common.childErrors errorList
 
