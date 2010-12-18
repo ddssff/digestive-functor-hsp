@@ -9,37 +9,37 @@ import Data.Text                       (Text)
 import qualified Data.Text             as Text
 import HSP                             (XMLGenerator, XMLGenT, EmbedAsChild(..), EmbedAsAttr(..), Attr(..), genElement, genEElement, set)
 import qualified HSX.XMLGenerator      as HSX
-import Text.Digestive
-import qualified Text.Digestive.Common as Common
+import Text.Digestive                   -- (Form, mapViews)
+import Text.Digestive.Common           as Common        -- (Form, mapViews)
+import Text.Digestive.Forms            as Forms -- (inputString, inputRead, inputBool, inputChoice)
+
 
 showFormId :: FormId -> String
 showFormId (FormId p i) = p ++ show i
 
-inputString :: (Monad m, Functor m, XMLGenerator x)
+inputString :: (Monad m, Functor m, XMLGenerator x, FormInput i f)
           => Maybe String
-          -> Form m String e [XMLGenT x (HSX.XML x)] String
+          -> Form m i e [XMLGenT x (HSX.XML x)] String
 inputString = 
-    Common.inputString $ \id' inp ->
+    Forms.inputString $ \id' inp ->
         [<input type="text" name=(showFormId id') id=(showFormId id') value=(fromMaybe "" inp) />]
 
-
 -- FIMXE: we really need a inputText primitive on Common. or maybe inputByteString?
-inputText :: (Monad m, Functor m, XMLGenerator x)
+inputText :: (Monad m, Functor m, XMLGenerator x, FormInput i f)
           => Maybe Text
-          -> Form m String e [XMLGenT x (HSX.XML x)] Text
+          -> Form m i e [XMLGenT x (HSX.XML x)] Text
 inputText v = 
     Text.pack <$>
-        ((Common.inputString $ \id' inp ->
+        ((Forms.inputString $ \id' inp ->
             [<input type="text" name=(showFormId id') id=(showFormId id') value=(fromMaybe "" inp) />]) (Text.unpack <$> v))
 
-
-inputTextArea :: (Monad m, Functor m, XMLGenerator x) =>
+inputTextArea :: (Monad m, Functor m, XMLGenerator x, FormInput i f) =>
                  Maybe Int
               -> Maybe Int
               -> Maybe String
-              -> Form m String e [XMLGenT x (HSX.XML x)] String
+              -> Form m i e [XMLGenT x (HSX.XML x)] String
 inputTextArea r c = 
-    Common.inputString $ \id' inp ->
+    Forms.inputString $ \id' inp ->
         [<textarea name=(showFormId id') id=(showFormId id') (rows r ++ cols c)><% fromMaybe "" inp %></textarea>]
     where
       rows Nothing  = []
@@ -47,25 +47,25 @@ inputTextArea r c =
       cols Nothing  = []
       cols (Just n) = [("cols" := n)]
 
-inputTextRead :: (Monad m, Functor m, Show a, Read a, XMLGenerator x)
+inputTextRead :: (Monad m, Functor m, Show a, Read a, XMLGenerator x, FormInput i f)
               => String
               -> Maybe a
-              -> Form m String String [XMLGenT x (HSX.XML x)] a
+              -> Form m i String [XMLGenT x (HSX.XML x)] a
 inputTextRead error' =
-    flip Common.inputRead error' $ \id' inp ->
+    flip inputRead error' $ \id' inp ->
         [<input type="text" name=(showFormId id') id=(showFormId id') value=(fromMaybe "" inp) />]
 
-inputPassword :: (Monad m, Functor m, XMLGenerator x)
-              => Form m String e [XMLGenT x (HSX.XML x)] String
+inputPassword :: (Monad m, Functor m, XMLGenerator x, FormInput i f)
+              => Form m i e [XMLGenT x (HSX.XML x)] String
 inputPassword =
-    flip Common.inputString Nothing $ \id' inp ->
+    flip Forms.inputString Nothing $ \id' inp ->
         [<input type="password" name=(showFormId id') id=(showFormId id') value=(fromMaybe "" inp) />]
 
-inputCheckBox :: (Monad m, Functor m, XMLGenerator x)
+inputCheckBox :: (Monad m, Functor m, XMLGenerator x, FormInput i f)
               => Bool
-              -> Form m String e [XMLGenT x (HSX.XML x)] Bool
+              -> Form m i e [XMLGenT x (HSX.XML x)] Bool
 inputCheckBox inp =
-    flip Common.inputBool inp $ \id' inp ->
+    flip inputBool inp $ \id' inp ->
         [<input type="checkbox" name=(showFormId id') id=(showFormId id') checked />]
     where
       checked =
@@ -73,27 +73,27 @@ inputCheckBox inp =
           then [("checked" := "checked")]
           else []
 
-inputRadio :: (Monad m, Functor m, Eq a, XMLGenerator x, EmbedAsChild x c, Monoid c)
-           => Bool                                      -- ^ Use @<br>@ tags
-           -> a                                         -- ^ Default option
-           -> [(a, c)]                                  -- ^ Choices with their names
-           -> Form m String e [XMLGenT x (HSX.XML x)] a -- ^ Resulting form
+inputRadio :: (Monad m, Functor m, Eq a, XMLGenerator x, EmbedAsChild x c, Monoid c, FormInput i f)
+           => Bool                                 -- ^ Use @<br>@ tags
+           -> a                                    -- ^ Default option
+           -> [(a, c)]                             -- ^ Choices with their names
+           -> Form m i e [XMLGenT x (HSX.XML x)] a -- ^ Resulting form
 inputRadio br def choices =
-    Common.inputChoice toView def (map fst choices)
+    inputChoice toView def (map fst choices)
   where
     toView group' id' sel val =
         [ <input type="radio" name=(showFormId group') id=id' value=id' />
         , <label for=id'><% fromMaybe mempty $ lookup val choices %></label>
         ] ++ if br then [<br />] else []
 
-submit :: (Monad m, Functor m, XMLGenerator x)
+submit :: (Monad m, Functor m, XMLGenerator x, FormInput i f)
           => String
-          -> Form m String e [XMLGenT x (HSX.XML x)] String
+          -> Form m i e [XMLGenT x (HSX.XML x)] String
 submit v = 
-    Common.inputString (\id' inp ->
+    Forms.inputString (\id' inp ->
         [<input type="submit" name=(showFormId id') id=(showFormId id') value=(fromMaybe "" inp) />]) (Just v)
 
-label :: (Monad m, XMLGenerator x, EmbedAsChild x c)
+label :: (Monad m, XMLGenerator x, EmbedAsChild x c, EmbedAsAttr x (Attr String String))
       => c
       -> Form m i e [XMLGenT x (HSX.XML x)] ()
 label string =
