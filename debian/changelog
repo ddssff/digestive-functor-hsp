@@ -1,3 +1,9 @@
+haskell-digestive-functors-hsp (0.2.1) unstable; urgency=low
+
+  * Fix showFormId to match what digestive-functors-happstack expects
+
+ -- Jeremy Shaw <jeremy@seereason.com>  Thu, 14 Apr 2011 12:40:37 -0500
+
 haskell-digestive-functors-hsp (0.2) unstable; urgency=low
 
   * Updated to digestive-functors 0.0.2.0

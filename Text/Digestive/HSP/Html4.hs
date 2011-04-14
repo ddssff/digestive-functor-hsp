@@ -4,7 +4,7 @@ module Text.Digestive.HSP.Html4 where
 
 import Control.Applicative             ((<$>))
 import Data.Maybe                      (fromMaybe)
-import Data.Monoid                     (Monoid(mempty))
+import Data.Monoid                     (Monoid(mempty), mconcat)
 import Data.Text                       (Text)
 import qualified Data.Text             as Text
 import HSP                             (XMLGenerator, XMLGenT, EmbedAsChild(..), EmbedAsAttr(..), Attr(..), genElement, genEElement, set)
@@ -15,7 +15,7 @@ import Text.Digestive.Forms            as Forms -- (inputString, inputRead, inpu
 
 
 showFormId :: FormId -> String
-showFormId (FormId p i) = p ++ show i
+showFormId id' = show id'
 
 inputString :: (Monad m, Functor m, XMLGenerator x, FormInput i f)
           => Maybe String
@@ -85,13 +85,14 @@ inputRadio br def choices =
         [ <input type="radio" name=(showFormId group') id=id' value=id' />
         , <label for=id'><% fromMaybe mempty $ lookup val choices %></label>
         ] ++ if br then [<br />] else []
-
 submit :: (Monad m, Functor m, XMLGenerator x, FormInput i f)
           => String
           -> Form m i e [XMLGenT x (HSX.XML x)] String
 submit v = 
     Forms.inputString (\id' inp ->
         [<input type="submit" name=(showFormId id') id=(showFormId id') value=(fromMaybe "" inp) />]) (Just v)
+
+
 
 label :: (Monad m, XMLGenerator x, EmbedAsChild x c, EmbedAsAttr x (Attr String String))
       => c
