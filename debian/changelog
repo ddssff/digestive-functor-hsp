@@ -1,3 +1,11 @@
+haskell-digestive-functors-hsp (0.3.0) unstable; urgency=low
+
+  * Change inputRadio to make the default value optional
+  * Added inputCheckboxes
+  * Added inputChoice and inputChoices (which really belong upstream)
+
+ -- Jeremy Shaw <jeremy@seereason.com>  Sun, 01 May 2011 10:40:41 -0500
+
 haskell-digestive-functors-hsp (0.2.1) unstable; urgency=low
 
   * Fix showFormId to match what digestive-functors-happstack expects
