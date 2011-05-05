@@ -1,3 +1,9 @@
+haskell-digestive-functors-hsp (0.4.1) unstable; urgency=low
+
+  * Added 'forms' wrap that creates a <form> element
+
+ -- Jeremy Shaw <jeremy@seereason.com>  Thu, 05 May 2011 15:32:29 -0500
+
 haskell-digestive-functors-hsp (0.4.0) unstable; urgency=low
 
   * Change inputRadio so that default value is required

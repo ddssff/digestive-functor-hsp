@@ -25,7 +25,7 @@ inputString =
     Forms.inputString $ \id' inp ->
         [<input type="text" name=(showFormId id') id=(showFormId id') value=(fromMaybe "" inp) />]
 
--- FIMXE: we really need a inputText primitive on Common. or maybe inputByteString?
+-- FIXME: use inputText from Forms when it becomes available
 inputText :: (Monad m, Functor m, XMLGenerator x, FormInput i f)
           => Maybe Text
           -> Form m i e [XMLGenT x (HSX.XML x)] Text
@@ -211,3 +211,22 @@ inputChoices toView defaults choices = Form $ do
 
 lookups :: (Eq a) => a -> [(a, b)] -> [b]
 lookups a = map snd . filter ((== a) . fst)
+
+-- |simple wrapper that creates form tag with the following attributes
+--
+-- @action=action@
+--
+-- @method="POST"@
+--
+-- @enctype="multipart/form-data"
+--
+-- @accept-charset="UTF-8"
+--
+form :: (XMLGenerator x, EmbedAsAttr x (Attr String action), EmbedAsChild x c) => 
+        action -- ^ value for action attribute
+     -> c      -- ^ contents of form tag
+     -> XMLGenT x (HSX.XML x)
+form action xml = 
+    <form action=action method="POST" enctype="multipart/form-data" accept-charset="UTF-8">
+      <% xml %>
+    </form>
