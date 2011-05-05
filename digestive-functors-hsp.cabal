@@ -1,5 +1,5 @@
 Name:                digestive-functors-hsp
-Version:             0.3.1
+Version:             0.4.0
 Synopsis:            HSP support for digestive-functors
 Description:         This is an HSP frontend for the digestive-functors library.
 Homepage:            http://src.seereason.com/digestive-functors-hsp

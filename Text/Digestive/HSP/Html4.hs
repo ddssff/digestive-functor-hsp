@@ -10,16 +10,16 @@ import Data.Text                       (Text)
 import qualified Data.Text             as Text
 import HSP                             (XMLGenerator, XMLGenT, EmbedAsChild(..), EmbedAsAttr(..), Attr(..), genElement, genEElement, set)
 import qualified HSX.XMLGenerator      as HSX
-import Text.Digestive                   -- (Form, mapViews)
-import Text.Digestive.Common           as Common        -- (Form, mapViews)
-import Text.Digestive.Forms            as Forms hiding (inputChoice) -- (inputString, inputRead, inputBool, inputChoice)
-
+import Text.Digestive                  (FormId, Form(..), Result(..), View(..), getFormId, getFormInput, isFormInput, mapView)
+import Text.Digestive.Common           as Common
+import Text.Digestive.Forms            as Forms
 
 showFormId :: FormId -> String
 showFormId id' = show id'
 
+-- text input box that returns a 'String'
 inputString :: (Monad m, Functor m, XMLGenerator x, FormInput i f)
-          => Maybe String
+          => Maybe String -- ^ initial value
           -> Form m i e [XMLGenT x (HSX.XML x)] String
 inputString = 
     Forms.inputString $ \id' inp ->
@@ -88,11 +88,20 @@ inputCheckboxes br defs choices =
         , <label for=id'><% fromMaybe mempty $ lookup val choices %></label>
         ] ++ if br then [<br />] else []
 
+-- | radio buttons
+--
+-- NOTE:
+--
+-- According to the spec
+-- <http://www.w3.org/TR/html401/interact/forms.html#h-17.2.1> radio
+-- buttons should be able to have an undefined state. But since
+-- user-agents are inconsistent about handling undefined, it is
+-- recommended that a default option always be provided.
 inputRadio :: (Monad m, Functor m, Eq a, XMLGenerator x, EmbedAsChild x c, Monoid c, FormInput i f)
            => Bool                                 -- ^ Use @<br>@ tags
-           -> Maybe a                              -- ^ Default option
+           -> a                                    -- ^ Default option
            -> [(a, c)]                             -- ^ Choices with their names
-           -> Form m i e [XMLGenT x (HSX.XML x)] (Maybe a) -- ^ Resulting form
+           -> Form m i e [XMLGenT x (HSX.XML x)] a -- ^ Resulting form
 inputRadio br def choices =
     inputChoice toView def (map fst choices)
   where
@@ -102,9 +111,9 @@ inputRadio br def choices =
         ] ++ if br then [<br />] else []
 
 inputSelect :: (Monad m, Functor m, Eq a, XMLGenerator x, EmbedAsChild x c, Monoid c, FormInput i f)
-           => Maybe a                              -- ^ Default option
+           => a                                    -- ^ Default option
            -> [(a, c)]                             -- ^ Choices with their names
-           -> Form m i e [XMLGenT x (HSX.XML x)] (Maybe a) -- ^ Resulting form
+           -> Form m i e [XMLGenT x (HSX.XML x)] a -- ^ Resulting form
 inputSelect def choices = 
     Form $ do id' <- getFormId
               unForm $ mapView (\cs -> [<select name=(showFormId id') id=(showFormId id')><% cs %></select>])
@@ -179,30 +188,6 @@ setAttrs :: (EmbedAsAttr x attr, XMLGenerator x, Monad m, Functor m) =>
          -> attr 
          -> Form m i e [HSX.GenXML x] a
 setAttrs form attrs = mapView (map (`set` attrs)) form
-
-
--- functions that really belong in digestive-functors
-
-
-inputChoice :: (Monad m, Functor m, FormInput i f, Monoid v, Eq a)
-            => (FormId -> String -> Bool -> a -> v)  -- ^ Choice constructor
-            -> Maybe a                               -- ^ Default option
-            -> [a]                                   -- ^ Choices
-            -> Form m i e v (Maybe a)                -- ^ Resulting form
-inputChoice toView defaultInput choices = Form $ do
-    inputKey <- fromMaybe "" . (getInputString =<<) <$> getFormInput
-    id' <- getFormId
-    formInput <- isFormInput
-    let -- Find the actual input, based on the key, or use the default input
-        inp = if formInput 
-              then lookup inputKey $ zip (ids id') choices
-              else defaultInput
-        -- Apply the toView' function to all choices
-        view' = mconcat $ zipWith (toView' id' inp) (ids id') choices
-    return (View (const view'), Ok inp)
-  where
-    ids id' = map (((show id' ++ "-") ++) . show) [1 .. length choices]
-    toView' id' inp key x = toView id' key (inp == Just x) x
 
 inputChoices :: (Monad m, Functor m, FormInput i f, Monoid v, Eq a)
             => (FormId -> String -> Bool -> a -> v)  -- ^ Choice constructor
