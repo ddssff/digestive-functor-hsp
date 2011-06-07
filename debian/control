@@ -6,19 +6,19 @@ Build-Depends: debhelper (>= 7.0),
                haskell-devscripts (>= 0.6.15+nmu7),
                hscolour,
                cdbs,
-               ghc6 (>= 6.8),
-               ghc6-prof,
-               libghc6-digestive-functors-prof (>= 0.0.2.0),
-               libghc6-hsp-prof,
-               libghc6-hsx-prof,
-               libghc6-text-prof,
+               ghc (>= 6.8),
+               ghc-prof,
+               libghc-digestive-functors-prof (>= 0.0.2.0),
+               libghc-hsp-prof,
+               libghc-hsx-prof,
+               libghc-text-prof,
 	       trhsx
 Build-Depends-Indep: ghc-doc,
                      haddock,
-                     libghc6-digestive-functors-doc (>= 0.0.2.0),
-                     libghc6-hsp-doc,
-                     libghc6-hsx-doc,
-                     libghc6-text-doc
+                     libghc-digestive-functors-doc (>= 0.0.2.0),
+                     libghc-hsp-doc,
+                     libghc-hsx-doc,
+                     libghc-text-doc
 Standards-Version: 3.8.1
 Homepage: http://src.seereason.com/digestive-functors-hsp
 
