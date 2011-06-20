@@ -10,14 +10,13 @@ Build-Depends: debhelper (>= 7.0),
                ghc-prof,
                libghc-digestive-functors-prof (>= 0.0.2.0),
                libghc-hsp-prof,
-               libghc-hsx-prof,
-               libghc-text-prof,
-	       trhsx
+               libghc-hsx-prof (>= 0.9.1),
+               libghc-text-prof
 Build-Depends-Indep: ghc-doc,
                      haddock,
                      libghc-digestive-functors-doc (>= 0.0.2.0),
                      libghc-hsp-doc,
-                     libghc-hsx-doc,
+                     libghc-hsx-doc (>= 0.9.1),
                      libghc-text-doc
 Standards-Version: 3.8.1
 Homepage: http://src.seereason.com/digestive-functors-hsp
