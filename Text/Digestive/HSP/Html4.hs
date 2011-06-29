@@ -35,11 +35,11 @@ inputText v =
             [<input type="text" name=(showFormId id') id=(showFormId id') value=(fromMaybe "" inp) />]) (Text.unpack <$> v))
 
 inputTextArea :: (Monad m, Functor m, XMLGenerator x, FormInput i f) =>
-                 Maybe Int
-              -> Maybe Int
+                 Maybe Int -- ^ cols
+              -> Maybe Int -- ^ rows
               -> Maybe String
               -> Form m i e [XMLGenT x (HSX.XML x)] String
-inputTextArea r c = 
+inputTextArea c r = 
     Forms.inputString $ \id' inp ->
         [<textarea name=(showFormId id') id=(showFormId id') (rows r ++ cols c)><% fromMaybe "" inp %></textarea>]
     where
@@ -142,6 +142,20 @@ submit :: (Monad m, Functor m, XMLGenerator x, FormInput i f)
 submit v = 
     Forms.inputString (\id' inp ->
         [<input type="submit" name=(showFormId id') id=(showFormId id') value=(fromMaybe "" inp) />]) (Just v)
+
+-- TODO: add hiddenText when new digestive functors is availabe on hackage that adds Forms.inputText
+inputHiddenString :: (Monad m, Functor m, XMLGenerator x, FormInput i f)
+          => String
+          -> Form m i e [XMLGenT x (HSX.XML x)] String
+inputHiddenString str = 
+    Forms.inputString 
+             (\id' inp ->
+                  [<input type="hidden" name=(show id') id=(show id') value=(fromMaybe "" inp) />])
+             (Just str)
+-- | file upload form
+inputFile :: (Monad m, Functor m, XMLGenerator x, FormInput i f) => 
+             Form m i e [XMLGenT x (HSX.XML x)] (Maybe f)
+inputFile = Forms.inputFile $ \id' -> [<input type="file" name=(show id') id=(show id') />]
 
 label :: (Monad m, XMLGenerator x, EmbedAsChild x c, EmbedAsAttr x (Attr String String))
       => c

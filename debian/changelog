@@ -1,3 +1,10 @@
+haskell-digestive-functors-hsp (0.4.2) unstable; urgency=low
+
+  * Added inputFile
+  * Added inputHiddenString
+
+ -- Jeremy Shaw <jeremy@seereason.com>  Wed, 29 Jun 2011 12:15:32 -0500
+
 haskell-digestive-functors-hsp (0.4.1) unstable; urgency=low
 
   * Added 'forms' wrap that creates a <form> element
