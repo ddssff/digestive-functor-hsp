@@ -1,5 +1,5 @@
 Name:                digestive-functors-hsp
-Version:             0.4.2
+Version:             0.4.3
 Synopsis:            HSP support for digestive-functors
 Description:         This is an HSP frontend for the digestive-functors library.
 Homepage:            http://src.seereason.com/digestive-functors-hsp
@@ -8,7 +8,7 @@ License-file:        LICENSE
 Author:              Jeremy Shaw
 Maintainer:          jeremy@n-heptane.com
 Category:            Web
-Build-type:          Simple
+Build-type:          Custom
 Cabal-version:       >=1.6
 
 
