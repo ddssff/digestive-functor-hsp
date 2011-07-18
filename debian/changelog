@@ -1,3 +1,9 @@
+haskell-digestive-functors-hsp (0.4.5) unstable; urgency=low
+
+  * really do what 0.4.4 was supposed to do
+
+ -- Jeremy Shaw <jeremy@seereason.com>  Sun, 17 Jul 2011 23:44:46 -0500
+
 haskell-digestive-functors-hsp (0.4.4) unstable; urgency=low
 
   * use inputChoices from digestive-functors 0.1.0.1 instead of local
