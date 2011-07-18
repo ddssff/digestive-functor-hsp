@@ -203,26 +203,6 @@ setAttrs :: (EmbedAsAttr x attr, XMLGenerator x, Monad m, Functor m) =>
          -> Form m i e [HSX.GenXML x] a
 setAttrs form attrs = mapView (map (`set` attrs)) form
 
-inputChoices :: (Monad m, Functor m, FormInput i f, Monoid v, Eq a)
-            => (FormId -> String -> Bool -> a -> v)  -- ^ Choice constructor
-            -> [a]                                   -- ^ Default options
-            -> [a]                                   -- ^ Choices
-            -> Form m i e v [a]                      -- ^ Resulting form
-inputChoices toView defaults choices = Form $ do
-    inputKeys <- maybe [] getInputStrings <$> getFormInput
-    id' <- getFormId
-    formInput <- isFormInput
-    let -- Find the actual input, based on the key, or use the default input
-        inps = if formInput 
-               then mapMaybe (\inputKey -> lookup inputKey $ zip (ids id') choices) inputKeys
-               else defaults
-        -- Apply the toView' function to all choices
-        view' = mconcat $ zipWith (toView' id' inps) (ids id') choices
-    return (View (const view'), Ok inps)
-  where
-    ids id' = map (((show id' ++ "-") ++) . show) [1 .. length choices]
-    toView' id' inps key x = toView id' key (x `elem` inps) x
-
 lookups :: (Eq a) => a -> [(a, b)] -> [b]
 lookups a = map snd . filter ((== a) . fst)
 
