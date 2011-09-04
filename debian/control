@@ -11,7 +11,8 @@ Build-Depends: debhelper (>= 7.0),
                libghc-digestive-functors-prof (>= 0.1.0.1),
                libghc-hsp-prof,
                libghc-hsx-prof (>= 0.9.1),
-               libghc-text-prof
+               libghc-text-prof,
+               trhsx
 Build-Depends-Indep: ghc-doc,
                      haddock,
                      libghc-digestive-functors-doc (>= 0.1.0.1),
