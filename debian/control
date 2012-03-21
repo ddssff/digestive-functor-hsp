@@ -12,7 +12,7 @@ Build-Depends: debhelper (>= 7.0),
                libghc-hsp-prof,
                libghc-hsx-prof (>= 0.9.1),
                libghc-text-prof,
-               trhsx
+               haskell-hsx-utils
 Build-Depends-Indep: ghc-doc,
                      haddock,
                      libghc-digestive-functors-doc (>= 0.1.0.1),
