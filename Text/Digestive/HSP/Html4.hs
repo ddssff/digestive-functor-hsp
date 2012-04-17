@@ -8,8 +8,8 @@ import Data.Maybe                      (fromMaybe, mapMaybe)
 import Data.Monoid                     (Monoid(mempty), mconcat)
 import Data.Text                       (Text)
 import qualified Data.Text             as Text
-import HSP                             (XMLGenerator, XMLGenT, EmbedAsChild(..), EmbedAsAttr(..), Attr(..), genElement, genEElement, set)
-import qualified HSX.XMLGenerator      as HSX
+import HSP                             (XMLGenerator, XMLGen(..), XMLGenT, EmbedAsChild(..), EmbedAsAttr(..), Attr(..), set)
+import HSX.XMLGenerator                (GenXML)
 import Text.Digestive                  (FormId, Form(..), Result(..), View(..), getFormId, getFormInput, isFormInput, mapView)
 import Text.Digestive.Common           as Common
 import Text.Digestive.Forms            as Forms
@@ -20,7 +20,7 @@ showFormId id' = show id'
 -- text input box that returns a 'String'
 inputString :: (Monad m, Functor m, XMLGenerator x, FormInput i f)
           => Maybe String -- ^ initial value
-          -> Form m i e [XMLGenT x (HSX.XML x)] String
+          -> Form m i e [XMLGenT x (XMLType x)] String
 inputString = 
     Forms.inputString $ \id' inp ->
         [<input type="text" name=(showFormId id') id=(showFormId id') value=(fromMaybe "" inp) />]
@@ -28,7 +28,7 @@ inputString =
 -- FIXME: use inputText from Forms when it becomes available
 inputText :: (Monad m, Functor m, XMLGenerator x, FormInput i f)
           => Maybe Text
-          -> Form m i e [XMLGenT x (HSX.XML x)] Text
+          -> Form m i e [XMLGenT x (XMLType x)] Text
 inputText v = 
     Text.pack <$>
         ((Forms.inputString $ \id' inp ->
@@ -38,7 +38,7 @@ inputTextArea :: (Monad m, Functor m, XMLGenerator x, FormInput i f) =>
                  Maybe Int -- ^ cols
               -> Maybe Int -- ^ rows
               -> Maybe String
-              -> Form m i e [XMLGenT x (HSX.XML x)] String
+              -> Form m i e [XMLGenT x (XMLType x)] String
 inputTextArea c r = 
     Forms.inputString $ \id' inp ->
         [<textarea name=(showFormId id') id=(showFormId id') (rows r ++ cols c)><% fromMaybe "" inp %></textarea>]
@@ -51,13 +51,13 @@ inputTextArea c r =
 inputTextRead :: (Monad m, Functor m, Show a, Read a, XMLGenerator x, FormInput i f)
               => String
               -> Maybe a
-              -> Form m i String [XMLGenT x (HSX.XML x)] a
+              -> Form m i String [XMLGenT x (XMLType x)] a
 inputTextRead error' =
     flip inputRead error' $ \id' inp ->
         [<input type="text" name=(showFormId id') id=(showFormId id') value=(fromMaybe "" inp) />]
 
 inputPassword :: (Monad m, Functor m, XMLGenerator x, FormInput i f)
-              => Form m i e [XMLGenT x (HSX.XML x)] String
+              => Form m i e [XMLGenT x (XMLType x)] String
 inputPassword =
     flip Forms.inputString Nothing $ \id' inp ->
         [<input type="password" name=(showFormId id') id=(showFormId id') value=(fromMaybe "" inp) />]
@@ -70,7 +70,7 @@ selected False = []
 
 inputCheckBox :: (Monad m, Functor m, XMLGenerator x, FormInput i f)
               => Bool
-              -> Form m i e [XMLGenT x (HSX.XML x)] Bool
+              -> Form m i e [XMLGenT x (XMLType x)] Bool
 inputCheckBox inp =
     flip inputBool inp $ \id' inp ->
         [<input type="checkbox" name=(showFormId id') id=(showFormId id') (checked inp) />]
@@ -79,7 +79,7 @@ inputCheckboxes :: (Monad m, Functor m, Eq a, XMLGenerator x, EmbedAsChild x c, 
            => Bool                                 -- ^ Use @<br>@ tags
            -> [a]                                  -- ^ Default option
            -> [(a, c)]                             -- ^ Choices with their names
-           -> Form m i e [XMLGenT x (HSX.XML x)] [a] -- ^ Resulting form
+           -> Form m i e [XMLGenT x (XMLType x)] [a] -- ^ Resulting form
 inputCheckboxes br defs choices =
     inputChoices toView defs (map fst choices)
   where
@@ -101,7 +101,7 @@ inputRadio :: (Monad m, Functor m, Eq a, XMLGenerator x, EmbedAsChild x c, Monoi
            => Bool                                 -- ^ Use @<br>@ tags
            -> a                                    -- ^ Default option
            -> [(a, c)]                             -- ^ Choices with their names
-           -> Form m i e [XMLGenT x (HSX.XML x)] a -- ^ Resulting form
+           -> Form m i e [XMLGenT x (XMLType x)] a -- ^ Resulting form
 inputRadio br def choices =
     inputChoice toView def (map fst choices)
   where
@@ -113,7 +113,7 @@ inputRadio br def choices =
 inputSelect :: (Monad m, Functor m, Eq a, XMLGenerator x, EmbedAsChild x c, Monoid c, FormInput i f)
            => a                                    -- ^ Default option
            -> [(a, c)]                             -- ^ Choices with their names
-           -> Form m i e [XMLGenT x (HSX.XML x)] a -- ^ Resulting form
+           -> Form m i e [XMLGenT x (XMLType x)] a -- ^ Resulting form
 inputSelect def choices = 
     Form $ do id' <- getFormId
               unForm $ mapView (\cs -> [<select name=(showFormId id') id=(showFormId id')><% cs %></select>])
@@ -125,7 +125,7 @@ inputSelect def choices =
 inputMultiSelect :: (Monad m, Functor m, Eq a, XMLGenerator x, EmbedAsChild x c, Monoid c, FormInput i f)
            => [a]                                  -- ^ Default options
            -> [(a, c)]                             -- ^ Choices with their names
-           -> Form m i e [XMLGenT x (HSX.XML x)] [a] -- ^ Resulting form
+           -> Form m i e [XMLGenT x (XMLType x)] [a] -- ^ Resulting form
 inputMultiSelect defs choices = 
     Form $ do id' <- getFormId
               unForm $ mapView (\cs -> [<select multiple="" name=(showFormId id') id=(showFormId id')><% cs %></select>])
@@ -138,7 +138,7 @@ inputMultiSelect defs choices =
 
 submit :: (Monad m, Functor m, XMLGenerator x, FormInput i f)
           => String
-          -> Form m i e [XMLGenT x (HSX.XML x)] String
+          -> Form m i e [XMLGenT x (XMLType x)] String
 submit v = 
     Forms.inputString (\id' inp ->
         [<input type="submit" name=(showFormId id') id=(showFormId id') value=(fromMaybe "" inp) />]) (Just v)
@@ -146,7 +146,7 @@ submit v =
 -- TODO: add hiddenText when new digestive functors is availabe on hackage that adds Forms.inputText
 inputHiddenString :: (Monad m, Functor m, XMLGenerator x, FormInput i f)
           => String
-          -> Form m i e [XMLGenT x (HSX.XML x)] String
+          -> Form m i e [XMLGenT x (XMLType x)] String
 inputHiddenString str = 
     Forms.inputString 
              (\id' inp ->
@@ -154,17 +154,17 @@ inputHiddenString str =
              (Just str)
 -- | file upload form
 inputFile :: (Monad m, Functor m, XMLGenerator x, FormInput i f) => 
-             Form m i e [XMLGenT x (HSX.XML x)] (Maybe f)
+             Form m i e [XMLGenT x (XMLType x)] (Maybe f)
 inputFile = Forms.inputFile $ \id' -> [<input type="file" name=(show id') id=(show id') />]
 
 label :: (Monad m, XMLGenerator x, EmbedAsChild x c, EmbedAsAttr x (Attr String String))
       => c
-      -> Form m i e [XMLGenT x (HSX.XML x)] ()
+      -> Form m i e [XMLGenT x (XMLType x)] ()
 label string =
     Common.label $ \id' ->
         [<label for=(showFormId id')><% string %></label>]
 
-errorList :: (XMLGenerator x, EmbedAsChild x c, EmbedAsChild x [HSX.XML x]) => [c] -> [XMLGenT x (HSX.XML x)]
+errorList :: (XMLGenerator x, EmbedAsChild x c, EmbedAsChild x [XMLType x]) => [c] -> [XMLGenT x (XMLType x)]
 errorList [] = []
 errorList children =
     [<ul>
@@ -172,12 +172,12 @@ errorList children =
      </ul>
     ]
 
-errors :: (Monad m, XMLGenerator x, EmbedAsChild x [HSX.XML x]) => 
-          Form m i String [XMLGenT x (HSX.XML x)] ()
+errors :: (Monad m, XMLGenerator x, EmbedAsChild x [XMLType x]) => 
+          Form m i String [XMLGenT x (XMLType x)] ()
 errors = Common.errors errorList
 
-childErrors :: (Monad m, XMLGenerator x, EmbedAsChild x [HSX.XML x]) => 
-               Form m i String [XMLGenT x (HSX.XML x)] ()
+childErrors :: (Monad m, XMLGenerator x, EmbedAsChild x [XMLType x]) => 
+               Form m i String [XMLGenT x (XMLType x)] ()
 childErrors = Common.childErrors errorList
 
 {-
@@ -198,9 +198,9 @@ testForm form =
 -}
 
 setAttrs :: (EmbedAsAttr x attr, XMLGenerator x, Monad m, Functor m) =>
-            Form m i e [HSX.GenXML x] a 
+            Form m i e [GenXML x] a 
          -> attr 
-         -> Form m i e [HSX.GenXML x] a
+         -> Form m i e [GenXML x] a
 setAttrs form attrs = mapView (map (`set` attrs)) form
 
 lookups :: (Eq a) => a -> [(a, b)] -> [b]
@@ -219,7 +219,7 @@ lookups a = map snd . filter ((== a) . fst)
 form :: (XMLGenerator x, EmbedAsAttr x (Attr String action), EmbedAsChild x c) => 
         action -- ^ value for action attribute
      -> c      -- ^ contents of form tag
-     -> XMLGenT x (HSX.XML x)
+     -> XMLGenT x (XMLType x)
 form action xml = 
     <form action=action method="POST" enctype="multipart/form-data" accept-charset="UTF-8">
       <% xml %>
