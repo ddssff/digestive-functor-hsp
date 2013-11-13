@@ -16,7 +16,7 @@ Library
   Exposed-modules:     Text.Digestive.HSP.Html4
   Build-depends:       base               == 4.*,
                        digestive-functors >= 0.2    && < 0.3,
-                       hsp                >= 0.9  && < 0.10,
+                       hsp                >= 0.9  && < 0.11,
                        text               == 0.11.*
   if !os(windows)
     -- Cabal has a bug on windows and cannot find trhsx
